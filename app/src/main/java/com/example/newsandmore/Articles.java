@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -123,9 +124,11 @@ public class Articles extends AppCompatActivity implements View.OnClickListener{
     //Uploading file to Firestore
     private void uploadFile()
     {
-        if(filePath != null)
+        final String artName = editText.getText().toString();
+        Log.i("check",artName);
+        if(filePath != null && !artName.equals(""))
         {
-            final String artName = editText.getText().toString();
+
             final ProgressDialog progressDialog =new ProgressDialog(this);
             progressDialog.setTitle("Uploading.....");
             progressDialog.show();
@@ -178,8 +181,11 @@ public class Articles extends AppCompatActivity implements View.OnClickListener{
         }
         else
         {
+            if(filePath == null)
             //error toast
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+            if(artName.equals(""))
+                Toast.makeText(this, "Please Give a name", Toast.LENGTH_SHORT).show();
         }
     }
 

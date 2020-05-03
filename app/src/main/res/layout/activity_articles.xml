@@ -47,6 +47,7 @@
         android:layout_marginTop="478dp"
         android:ems="10"
         android:hint="Enter Name of the Article"
+        android:text=""
         android:inputType="textPersonName"
         android:textColor="#ECE3E3"
         android:textColorHint="@color/cardview_light_background"

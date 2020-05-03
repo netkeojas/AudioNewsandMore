@@ -123,9 +123,10 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
     //Uploading file to Firestore
     private void uploadFile()
     {
-        if(filePath != null)
+        final String bookName = editText.getText().toString();
+        if(filePath != null && !bookName.equals(""))
         {
-            final String bookName = editText.getText().toString();
+
             final ProgressDialog progressDialog =new ProgressDialog(this);
             progressDialog.setTitle("Uploading.....");
             progressDialog.show();
@@ -178,8 +179,12 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
         }
         else
         {
+            if (filePath == null)
             //error toast
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+
+            if(bookName.equals(""))
+                Toast.makeText(this, "Please Enter Book name", Toast.LENGTH_SHORT).show();
         }
     }
 

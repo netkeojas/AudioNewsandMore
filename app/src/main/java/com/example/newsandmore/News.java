@@ -123,9 +123,10 @@ public class News extends AppCompatActivity implements View.OnClickListener{
     //Uploading file to Firestore
     private void uploadFile()
     {
-        if(filePath != null)
+        final String dateOfNews = editText.getText().toString();
+        if(filePath != null && !dateOfNews.equals(""))
         {
-            final String dateOfNews = editText.getText().toString();
+
             final ProgressDialog progressDialog =new ProgressDialog(this);
             progressDialog.setTitle("Uploading.....");
             progressDialog.show();
@@ -178,8 +179,12 @@ public class News extends AppCompatActivity implements View.OnClickListener{
         }
         else
         {
+            if (filePath == null)
             //error toast
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+
+            if(dateOfNews.equals(""))
+                Toast.makeText(this, "Enter a date", Toast.LENGTH_SHORT).show();
         }
     }
 
