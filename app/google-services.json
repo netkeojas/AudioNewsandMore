@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "442802293436",
+    "firebase_url": "https://news-and-more-87d9a.firebaseio.com",
+    "project_id": "news-and-more-87d9a",
+    "storage_bucket": "news-and-more-87d9a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:442802293436:android:64ef0006f640e6b36f5eb9",
+        "android_client_info": {
+          "package_name": "com.example.newsandmore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "442802293436-si5m68fujjh06tj3vhq3hq0j3na8b2mr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.newsandmore",
+            "certificate_hash": "f5e0c18d535e403ba2f653a1350854a792b7c091"
+          }
+        },
+        {
+          "client_id": "442802293436-m07iernnbsqi9bci8koeorq5e0noe4fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA61_Rgbbn2umTsc-6G6M1ws3642m28ec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "442802293436-m07iernnbsqi9bci8koeorq5e0noe4fm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
