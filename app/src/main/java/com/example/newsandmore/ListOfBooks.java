@@ -26,12 +26,14 @@ public class ListOfBooks extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_of_books);
         booklist = new ArrayList<>();
         setUpFB();
         setUpRV();
         dataFromFB();
+
     }
 
 
@@ -39,7 +41,9 @@ public class ListOfBooks extends AppCompatActivity {
     {
         if(booklist.size()>0)
         {
+
             booklist.clear();
+
         }
         db.collection("bookColl").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -52,7 +56,7 @@ public class ListOfBooks extends AppCompatActivity {
                             booklist.add(bksModel);
                         }
 
-                        bksAdapter = new BksAdapter(ListOfBooks.this,booklist);
+                        bksAdapter = new BksAdapter(ListOfBooks.this,booklist,ListOfBooks.this);
                         recyclerView.setAdapter(bksAdapter);
                     }
                 })
@@ -73,8 +77,10 @@ public class ListOfBooks extends AppCompatActivity {
 
     private void setUpRV()
     {
+
         recyclerView = findViewById(R.id.recyclerViewB);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
     }
 }

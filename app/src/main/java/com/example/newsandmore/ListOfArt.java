@@ -72,19 +72,19 @@ public class ListOfArt extends AppCompatActivity {
                             list.add(am);
                         }
 
-                        artAdapter = new ArtAdapter(ListOfArt.this,list);
+                        artAdapter = new ArtAdapter(ListOfArt.this,list,ListOfArt.this);
                         recyclerView.setAdapter(artAdapter);
 
-                        artAdapter.setOnItemClickListener(new ArtAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(int position) {
-
-                                Intent intent = new Intent(getApplicationContext(),MusicPlayer.class);
-                                intent.putExtra("aName",list.get(position).getName());
-                                intent.putExtra("aLink",list.get(position).getLink());
-                                startActivity(intent);
-                            }
-                        });
+//                        artAdapter.setOnItemClickListener(new ArtAdapter.OnItemClickListener() {
+//                            @Override
+//                            public void onItemClick(int position) {
+//
+//                                Intent intent = new Intent(getApplicationContext(),MusicPlayer.class);
+//                                intent.putExtra("aName",list.get(position).getName());
+//                                intent.putExtra("aLink",list.get(position).getLink());
+//                                startActivity(intent);
+//                            }
+//                        });
 
                     }
                 })

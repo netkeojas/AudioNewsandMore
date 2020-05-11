@@ -11,14 +11,15 @@ public class bookViewHolder extends RecyclerView.ViewHolder {
 
     TextView bname;
     TextView blink;
-    Button Bplay,Bstop;
+    Button Bplay;
 
     public bookViewHolder(@NonNull View itemView) {
         super(itemView);
 
         Bplay = itemView.findViewById(R.id.playB);
-        Bstop = itemView.findViewById(R.id.stopB);
         bname = itemView.findViewById(R.id.bname);
         blink = itemView.findViewById(R.id.linkB);
+
+
     }
 }

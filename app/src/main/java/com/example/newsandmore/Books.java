@@ -11,6 +11,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,10 +32,10 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
     private Button chooseBtn,uploadBtn,viewBksBtn;
     public static final int PICK_AUDIO_REQUEST = 123;
     private Uri filePath;
-    private TextView textView;
+    private TextView fileName;
     private MediaPlayer mediaPlayer;
     private StorageReference storageReference;
-    private EditText editText;
+    private EditText nameOfBook;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
@@ -50,8 +52,8 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
 
         chooseBtn = (Button) findViewById(R.id.chooseB);
         uploadBtn = (Button) findViewById(R.id.uploadB);
-        textView=(TextView) findViewById(R.id.textView2B);
-        editText = (EditText) findViewById(R.id.editText4B);
+        fileName=(TextView) findViewById(R.id.fileNameB);
+        nameOfBook = (EditText) findViewById(R.id.bookName);
         viewBksBtn =(Button) findViewById(R.id.viewBooks);
 
 
@@ -112,7 +114,7 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
 
             try {
 
-                textView.setText(getFilename(filePath));
+                fileName.setText(getFilename(filePath));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -123,7 +125,7 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
     //Uploading file to Firestore
     private void uploadFile()
     {
-        final String bookName = editText.getText().toString();
+        final String bookName = nameOfBook.getText().toString();
         if(filePath != null && !bookName.equals(""))
         {
 
@@ -156,6 +158,9 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
                             });
                             progressDialog.dismiss();
                             Toast.makeText(Books.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                            nameOfBook.setText("");
+                            fileName.setText("Book");
+                            filePath = null;
 
                         }
                     })
@@ -194,16 +199,19 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
         if(view == chooseBtn)
         {
             showfileChooser();
+
         }
 
         else if(view == uploadBtn)
         {
             uploadFile();
+
         }
         else if(view == viewBksBtn)
         {
             Intent intent = new Intent(getApplicationContext(),ListOfBooks.class);
             startActivity(intent);
+
         }
 
     }

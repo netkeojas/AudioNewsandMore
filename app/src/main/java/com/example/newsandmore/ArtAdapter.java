@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class ArtAdapter extends RecyclerView.Adapter<ArtAdapter.ArtViewHolder> {
+public class ArtAdapter extends RecyclerView.Adapter<ArtViewHolder> {
 
     //------------
     ListOfArt listOfArt;
@@ -24,6 +25,7 @@ public class ArtAdapter extends RecyclerView.Adapter<ArtAdapter.ArtViewHolder> {
     //------------
     ArrayList<articleModel> list;
     private OnItemClickListener mlistener;
+    Context context;
 
 
     public interface OnItemClickListener{
@@ -31,17 +33,18 @@ public class ArtAdapter extends RecyclerView.Adapter<ArtAdapter.ArtViewHolder> {
 
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener)
-    {
-        mlistener = listener;
-    }
+//    public void setOnItemClickListener(OnItemClickListener listener)
+//    {
+//        mlistener = listener;
+//    }
 
 
     //Constructor
-    public ArtAdapter(ListOfArt listOfArt,ArrayList<articleModel> list) {
+    public ArtAdapter(ListOfArt listOfArt,ArrayList<articleModel> list, Context context) {
         this.listOfArt = listOfArt;
         //this.mainActivity = mainActivity;
         this.list = list;
+        this.context=context;
     }
 
 
@@ -65,78 +68,23 @@ public class ArtAdapter extends RecyclerView.Adapter<ArtAdapter.ArtViewHolder> {
         // Play button function
         holder.mPlay.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                pAudio(holder.mName.getContext(),list.get(position).getLink());
+            public void onClick(View v) {
+                Bundle extras = new Bundle();
+
+                extras.putString("name",list.get(position).getName());
+                extras.putString("link",list.get(position).getLink());
+
+                Intent intent = new Intent(context, AudioPlayer.class);
+                intent.putExtras(extras);
+                v.getContext().startActivity(intent);
             }
         });
-
-        //Stop button function
-        holder.mStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sAudio(holder.mName.getContext(),list.get(position).getLink());
-            }
-        });
     }
 
-    MediaPlayer mediaPlayer = new MediaPlayer();
-    public void pAudio(Context context,String url)  {
-        Uri uri= Uri.parse(url);
-
-        try {
-            mediaPlayer.setDataSource(context,uri);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.start();
-    }
-
-    public void sAudio(Context context,String url)  {
-        Uri uri= Uri.parse(url);
-        //MediaPlayer mediaPlayer = new MediaPlayer();
-        mediaPlayer.stop();
-        mediaPlayer.release();
-    }
 
     @Override
     public int getItemCount() {
         return list.size();
     }
-
-    public class ArtViewHolder extends RecyclerView.ViewHolder {
-
-        TextView mName,mLink;
-        Button mPlay,mStop;
-
-        public ArtViewHolder(@NonNull View itemView) {
-            super(itemView);
-            mName=itemView.findViewById(R.id.nameA);
-            mLink=itemView.findViewById(R.id.linkA);
-            mPlay=itemView.findViewById(R.id.playA);
-            mStop=itemView.findViewById(R.id.stopA);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    if(mlistener!=null)
-                    {
-                        int position = getAdapterPosition();
-                        if(position!=RecyclerView.NO_POSITION){
-                            mlistener.onItemClick(position);
-                        }
-                    }
-
-                }
-            });
-
-        }
-    }
-
 
 }

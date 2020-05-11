@@ -9,10 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ListOfBooks"></activity>
+        <activity android:name=".AudioPlayer"></activity>
+        <activity android:name=".Feedback" />
+        <activity android:name=".ListOfBooks" />
         <activity android:name=".Books" />
         <activity android:name=".ListOfNews" />
-        <activity android:name=".MusicPlayer" />
         <activity android:name=".News" />
         <activity android:name=".ListOfArt" />
         <activity android:name=".Articles" />

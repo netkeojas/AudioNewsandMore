@@ -4,15 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,16 +30,20 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.Calendar;
+
 public class News extends AppCompatActivity implements View.OnClickListener{
 
     private Button chooseBtn,uploadBtn,viewNwsBtn;
     public static final int PICK_AUDIO_REQUEST = 123;
     private Uri filePath;
-    private TextView textView;
+    private TextView fileName;
     private MediaPlayer mediaPlayer;
     private StorageReference storageReference;
-    private EditText editText;
+    private TextView newsDate;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private DatePickerDialog.OnDateSetListener dateSetListener;
 
 
     private static final String Key_Link="Link";
@@ -50,14 +59,63 @@ public class News extends AppCompatActivity implements View.OnClickListener{
 
         chooseBtn = (Button) findViewById(R.id.chooseN);
         uploadBtn = (Button) findViewById(R.id.uploadN);
-        textView=(TextView) findViewById(R.id.textView2N);
-        editText = (EditText) findViewById(R.id.editText4N);
+        //Displays name of the file
+        fileName=(TextView) findViewById(R.id.fileNameN);
+        //Displays Date
+        newsDate = (TextView) findViewById(R.id.newsDate);
         viewNwsBtn =(Button) findViewById(R.id.viewNews);
 
 
         chooseBtn.setOnClickListener(this);
         uploadBtn.setOnClickListener(this);
         viewNwsBtn.setOnClickListener(this);
+
+        setDate();
+        //if(!verifyDate())
+//        {
+//            Toast.makeText(this, "Date already exist", Toast.LENGTH_SHORT).show();
+//
+//        }
+
+    }
+
+    //Date Picker
+    private void setDate()
+    {
+        newsDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar cal = Calendar.getInstance();
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog dialog = new DatePickerDialog(
+                        News.this,
+                        android.R.style.Theme_Holo_Dialog,
+                        dateSetListener,
+                        year,month,day
+                );
+                dialog.getDatePicker().setMaxDate(cal.getTimeInMillis());
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+            }
+        });
+
+        dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
+                month = month+1;
+
+                String date = month + "-" + day + "-" + year;
+                Log.d("Date","onDateSet : Date (dd-mm-yyyy):" + day + "-" + month + "-" + year);
+                newsDate.setText(date);
+
+            }
+        };
+
+
 
     }
 
@@ -112,7 +170,7 @@ public class News extends AppCompatActivity implements View.OnClickListener{
 
             try {
 
-                textView.setText(getFilename(filePath));
+                fileName.setText(getFilename(filePath));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -123,7 +181,7 @@ public class News extends AppCompatActivity implements View.OnClickListener{
     //Uploading file to Firestore
     private void uploadFile()
     {
-        final String dateOfNews = editText.getText().toString();
+        final String dateOfNews = newsDate.getText().toString();
         if(filePath != null && !dateOfNews.equals(""))
         {
 
@@ -156,6 +214,9 @@ public class News extends AppCompatActivity implements View.OnClickListener{
                             });
                             progressDialog.dismiss();
                             Toast.makeText(News.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                            newsDate.setText("");
+                            fileName.setText("");
+                            filePath = null;
 
                         }
                     })
@@ -174,6 +235,8 @@ public class News extends AppCompatActivity implements View.OnClickListener{
                     progressDialog.setMessage(((int)progress) + "% uploaded");
                 }
             });
+
+
 
 
         }

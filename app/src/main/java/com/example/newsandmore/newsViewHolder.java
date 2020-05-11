@@ -11,13 +11,12 @@ public class newsViewHolder extends RecyclerView.ViewHolder {
 
     TextView Ndate;
     TextView Nlink;
-    Button Nplay,Nstop;
+    Button Nplay;
 
     public newsViewHolder(@NonNull View itemView) {
         super(itemView);
 
         Nplay = itemView.findViewById(R.id.playN);
-        Nstop = itemView.findViewById(R.id.stopN);
         Ndate = itemView.findViewById(R.id.date);
         Nlink = itemView.findViewById(R.id.linkN);
     }

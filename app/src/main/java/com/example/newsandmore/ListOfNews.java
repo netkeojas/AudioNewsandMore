@@ -54,7 +54,7 @@ public class ListOfNews extends AppCompatActivity {
                             newslist.add(nwsModel);
                         }
 
-                        nwsAdapter = new NwsAdapter(ListOfNews.this,newslist);
+                        nwsAdapter = new NwsAdapter(ListOfNews.this,newslist,ListOfNews.this);
                         recyclerView.setAdapter(nwsAdapter);
                     }
                 })

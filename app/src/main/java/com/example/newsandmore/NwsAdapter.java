@@ -1,5 +1,8 @@
 package com.example.newsandmore;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +16,12 @@ public class NwsAdapter extends RecyclerView.Adapter<newsViewHolder> {
 
     ListOfNews listOfNews;
     ArrayList<newsModel> newslist;
+    Context context;
 
-    public NwsAdapter(ListOfNews listOfNews, ArrayList<newsModel> newslist) {
+    public NwsAdapter(ListOfNews listOfNews, ArrayList<newsModel> newslist,Context context) {
         this.listOfNews = listOfNews;
         this.newslist = newslist;
+        this.context = context;
     }
 
     @NonNull
@@ -29,10 +34,24 @@ public class NwsAdapter extends RecyclerView.Adapter<newsViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull newsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull newsViewHolder holder, final int position) {
 
         holder.Ndate.setText(newslist.get(position).getdate());
         holder.Nlink.setText(newslist.get(position).getLink());
+
+        holder.Nplay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle extras = new Bundle();
+
+                extras.putString("name",newslist.get(position).getdate());
+                extras.putString("link",newslist.get(position).getLink());
+
+                Intent intent = new Intent(context, AudioPlayer.class);
+                intent.putExtras(extras);
+                v.getContext().startActivity(intent);
+            }
+        });
 
     }
 
