@@ -22,8 +22,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -34,16 +36,17 @@ import java.util.Calendar;
 
 public class News extends AppCompatActivity implements View.OnClickListener{
 
-    private Button chooseBtn,uploadBtn,viewNwsBtn;
+    private Button chooseBtn,uploadBtn,viewNwsBtn,delNwsBtn;
     public static final int PICK_AUDIO_REQUEST = 123;
     private Uri filePath;
     private TextView fileName;
     private MediaPlayer mediaPlayer;
     private StorageReference storageReference;
-    private TextView newsDate;
+    private TextView newsDate,newsToDel;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String date="";
 
-    private DatePickerDialog.OnDateSetListener dateSetListener;
+    private DatePickerDialog.OnDateSetListener dateSetListener1,dateSetListener2;
 
 
     private static final String Key_Link="Link";
@@ -64,23 +67,25 @@ public class News extends AppCompatActivity implements View.OnClickListener{
         //Displays Date
         newsDate = (TextView) findViewById(R.id.newsDate);
         viewNwsBtn =(Button) findViewById(R.id.viewNews);
+        delNwsBtn = (Button) findViewById(R.id.delbtnN);
+        newsToDel = (TextView) findViewById(R.id.delNameN);
 
 
         chooseBtn.setOnClickListener(this);
         uploadBtn.setOnClickListener(this);
         viewNwsBtn.setOnClickListener(this);
+        delNwsBtn.setOnClickListener(this);
+        newsDate.setOnClickListener(this);
+        newsToDel.setOnClickListener(this);
 
-        setDate();
-        //if(!verifyDate())
-//        {
-//            Toast.makeText(this, "Date already exist", Toast.LENGTH_SHORT).show();
-//
-//        }
+        setDate1();
+        setDate2();
+
 
     }
 
     //Date Picker
-    private void setDate()
+    private void setDate1()
     {
         newsDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +98,7 @@ public class News extends AppCompatActivity implements View.OnClickListener{
                 DatePickerDialog dialog = new DatePickerDialog(
                         News.this,
                         android.R.style.Theme_Holo_Dialog,
-                        dateSetListener,
+                        dateSetListener1,
                         year,month,day
                 );
                 dialog.getDatePicker().setMaxDate(cal.getTimeInMillis());
@@ -102,7 +107,7 @@ public class News extends AppCompatActivity implements View.OnClickListener{
             }
         });
 
-        dateSetListener = new DatePickerDialog.OnDateSetListener() {
+        dateSetListener1 = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
 
@@ -114,9 +119,42 @@ public class News extends AppCompatActivity implements View.OnClickListener{
 
             }
         };
+    }
 
+    private void setDate2()
+    {
+        newsToDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar cal = Calendar.getInstance();
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+                int day = cal.get(Calendar.DAY_OF_MONTH);
 
+                DatePickerDialog dialog = new DatePickerDialog(
+                        News.this,
+                        android.R.style.Theme_Holo_Dialog,
+                        dateSetListener2,
+                        year,month,day
+                );
+                dialog.getDatePicker().setMaxDate(cal.getTimeInMillis());
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+            }
+        });
 
+        dateSetListener2 = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
+                month = month+1;
+
+                String date = month + "-" + day + "-" + year;
+                Log.d("Date","onDateSet : Date (dd-mm-yyyy):" + day + "-" + month + "-" + year);
+                newsToDel.setText(date);
+
+            }
+        };
     }
 
 
@@ -209,7 +247,7 @@ public class News extends AppCompatActivity implements View.OnClickListener{
                                     map.put(Key_Link,link);*/
 
                                     newsModel nm = new newsModel(name,link);
-                                    db.collection("newsColl").document().set(nm);
+                                    db.collection("newsColl").document(name).set(nm);
                                 }
                             });
                             progressDialog.dismiss();
@@ -236,9 +274,6 @@ public class News extends AppCompatActivity implements View.OnClickListener{
                 }
             });
 
-
-
-
         }
         else
         {
@@ -250,6 +285,63 @@ public class News extends AppCompatActivity implements View.OnClickListener{
                 Toast.makeText(this, "Enter a date", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    //Deleting a file from FireStore
+    private void delFile()
+    {
+        final String delNews = newsToDel.getText().toString();
+
+        if(!delNews.equals(""))
+        {
+            final ProgressDialog progressDialog =new ProgressDialog(this);
+            progressDialog.setTitle("Deleting.....");
+            progressDialog.show();
+
+            StorageReference delRef = storageReference.child("News/"+delNews+".mp3");
+
+
+            delRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    //Success
+                    //Delete it from Database as well.
+
+                    db.collection("newsColl").document(delNews).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            //Deleted from DB
+                            Toast.makeText(News.this, "Deleted from DB", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //Failed to deleted from db
+                            Toast.makeText(News.this, "Failed to delete from Db", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    progressDialog.dismiss();
+                    Toast.makeText(News.this, "Deleted", Toast.LENGTH_SHORT).show();
+                    newsToDel.setText("");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    //Failed
+                    progressDialog.dismiss();
+                    Toast.makeText(News.this, "Deletion Failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+        }
+        else
+        {
+            Toast.makeText(this, "Enter news Date", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -268,6 +360,36 @@ public class News extends AppCompatActivity implements View.OnClickListener{
             Intent intent = new Intent(getApplicationContext(),ListOfNews.class);
             startActivity(intent);
         }
+        else if(view == delNwsBtn)
+        {
+            delFile();
+        }
+//        else if(view == newsToDel || view == newsDate)
+//        {
+//            Calendar cal = Calendar.getInstance();
+//                int year = cal.get(Calendar.YEAR);
+//                int month = cal.get(Calendar.MONTH);
+//                int day = cal.get(Calendar.DAY_OF_MONTH);
+//
+//                DatePickerDialog dialog = new DatePickerDialog(
+//                        News.this,
+//                        android.R.style.Theme_Holo_Dialog,
+//                        dateSetListener,
+//                       year,month,day
+//                );
+//                dialog.getDatePicker().setMaxDate(cal.getTimeInMillis());
+//                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                dialog.show();
+//
+//                if(view == newsToDel)
+//                {
+//                    newsToDel.setText(setDate(view));
+//                }
+//                else
+//                {
+//                    newsDate.setText(setDate(view));
+//                }
+//        }
 
     }
 }

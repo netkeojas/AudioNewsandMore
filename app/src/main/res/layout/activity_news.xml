@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/back"
     tools:context=".News">
 
@@ -85,17 +85,64 @@
         android:id="@+id/viewNews"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="227dp"
-        android:layout_marginBottom="184dp"
         android:layout_marginLeft="100dp"
+        android:layout_marginTop="73dp"
         android:layout_marginRight="100dp"
+        android:layout_marginBottom="184dp"
         android:padding="20dp"
         android:text="View News"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/newsDate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dividerN" />
+
+    <View
+        android:id="@+id/dividerN"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="39dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginRight="1dp"
+        android:background="@color/cardview_light_background"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/delbtnN" />
+
+    <TextView
+        android:id="@+id/delNameN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="31dp"
+        android:layout_marginRight="50dp"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="Name of the book to be Deleted"
+        android:padding="10dp"
+        android:text=""
+        android:textColor="@color/cardview_light_background"
+        android:textColorHint="@color/cardview_light_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/delbtnN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="31dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginBottom="20dp"
+        android:text="Delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/delNameN" />
+
 
     <!--
     <RelativeLayout

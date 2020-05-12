@@ -20,8 +20,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -30,13 +32,13 @@ import com.google.firebase.storage.UploadTask;
 
 public class Articles extends AppCompatActivity implements View.OnClickListener{
 
-    private Button chooseBtn,uploadBtn,viewArtBtn;
+    private Button chooseBtn,uploadBtn,viewArtBtn,delArtBtn;
     public static final int PICK_AUDIO_REQUEST = 123;
     private Uri filePath;
     private TextView fileName;
     private MediaPlayer mediaPlayer;
     private StorageReference storageReference;
-    private EditText articeName;
+    private EditText articeName,artToDel;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
@@ -56,11 +58,14 @@ public class Articles extends AppCompatActivity implements View.OnClickListener{
         fileName=(TextView) findViewById(R.id.fileNameA);
         articeName = (EditText) findViewById(R.id.artName);
         viewArtBtn =(Button) findViewById(R.id.viewArticle);
+        delArtBtn = (Button) findViewById(R.id.delbtnA);
+        artToDel = (EditText) findViewById(R.id.delNameA);
 
 
         chooseBtn.setOnClickListener(this);
         uploadBtn.setOnClickListener(this);
         viewArtBtn.setOnClickListener(this);
+        delArtBtn.setOnClickListener(this);
 
 
     }
@@ -156,7 +161,7 @@ public class Articles extends AppCompatActivity implements View.OnClickListener{
                                     map.put(Key_Link,link);*/
 
                                     articleModel am = new articleModel(name,link);
-                                    db.collection("articleColl").document().set(am);
+                                    db.collection("articleColl").document(name).set(am);
                                 }
                             });
                             progressDialog.dismiss();
@@ -195,6 +200,62 @@ public class Articles extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
+
+    private void delFile()
+    {
+        final String delArticle = artToDel.getText().toString();
+
+        if(!delArticle.equals(""))
+        {
+            final ProgressDialog progressDialog =new ProgressDialog(this);
+            progressDialog.setTitle("Deleting.....");
+            progressDialog.show();
+
+            StorageReference delRef = storageReference.child("Articles/"+delArticle+".mp3");
+
+
+            delRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    //Success
+                    //Delete it from Database as well.
+
+                    db.collection("articleColl").document(delArticle).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            //Deleted from DB
+                            Toast.makeText(Articles.this, "Deleted from DB", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //Failed to deleted from db
+                            Toast.makeText(Articles.this, "Failed to delete from Db", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    progressDialog.dismiss();
+                    Toast.makeText(Articles.this, "Deleted", Toast.LENGTH_SHORT).show();
+                    artToDel.setText("");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    //Failed
+                    progressDialog.dismiss();
+                    Toast.makeText(Articles.this, "Deletion Failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+        }
+        else
+        {
+            Toast.makeText(this, "Enter article name", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
     @Override
     public void onClick(View view) {
 
@@ -211,6 +272,10 @@ public class Articles extends AppCompatActivity implements View.OnClickListener{
         {
             Intent intent = new Intent(getApplicationContext(),ListOfArt.class);
             startActivity(intent);
+        }
+        else if(view == delArtBtn)
+        {
+            delFile();
         }
 
     }

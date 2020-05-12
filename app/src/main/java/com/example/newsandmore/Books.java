@@ -13,15 +13,20 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -29,13 +34,13 @@ import com.google.firebase.storage.UploadTask;
 
 public class Books extends AppCompatActivity implements View.OnClickListener{
 
-    private Button chooseBtn,uploadBtn,viewBksBtn;
+    private Button chooseBtn,uploadBtn,viewBksBtn,delBksBtn;
     public static final int PICK_AUDIO_REQUEST = 123;
     private Uri filePath;
     private TextView fileName;
     private MediaPlayer mediaPlayer;
     private StorageReference storageReference;
-    private EditText nameOfBook;
+    private EditText nameOfBook,bookToDel;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
@@ -55,11 +60,14 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
         fileName=(TextView) findViewById(R.id.fileNameB);
         nameOfBook = (EditText) findViewById(R.id.bookName);
         viewBksBtn =(Button) findViewById(R.id.viewBooks);
+        delBksBtn = (Button) findViewById(R.id.delbtnB);
+        bookToDel = (EditText) findViewById(R.id.delNameB);
 
 
         chooseBtn.setOnClickListener(this);
         uploadBtn.setOnClickListener(this);
         viewBksBtn.setOnClickListener(this);
+        delBksBtn.setOnClickListener(this);
 
     }
 
@@ -148,12 +156,8 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
                                     String link = uri.toString();
                                     String name = bookName;
 
-                                    /*Map<String,Object> map = new HashMap<>();
-                                    map.put(Key_Name,name);
-                                    map.put(Key_Link,link);*/
-
                                     bookModel bm = new bookModel(name,link);
-                                    db.collection("bookColl").document().set(bm);
+                                    db.collection("bookColl").document(name).set(bm);
                                 }
                             });
                             progressDialog.dismiss();
@@ -193,6 +197,61 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
+    //Deleting a file from FireStore
+    private void delFile()
+    {
+        final String delBook = bookToDel.getText().toString();
+
+        if(!delBook.equals(""))
+        {
+            final ProgressDialog progressDialog =new ProgressDialog(this);
+            progressDialog.setTitle("Deleting.....");
+            progressDialog.show();
+
+             StorageReference delRef = storageReference.child("Books/"+delBook+".mp3");
+
+
+            delRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    //Success
+                    //Delete it from Database as well.
+
+                    db.collection("bookColl").document(delBook).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            //Deleted from DB
+                            Toast.makeText(Books.this, "Deleted from DB", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //Failed to deleted from db
+                            Toast.makeText(Books.this, "Failed to delete from Db", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    progressDialog.dismiss();
+                    Toast.makeText(Books.this, "Deleted", Toast.LENGTH_SHORT).show();
+                    bookToDel.setText("");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                   //Failed
+                    progressDialog.dismiss();
+                    Toast.makeText(Books.this, "Deletion Failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+        }
+        else
+        {
+            Toast.makeText(this, "Enter book name", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onClick(View view) {
 
@@ -212,6 +271,10 @@ public class Books extends AppCompatActivity implements View.OnClickListener{
             Intent intent = new Intent(getApplicationContext(),ListOfBooks.class);
             startActivity(intent);
 
+        }
+        else if(view == delBksBtn)
+        {
+            delFile();
         }
 
     }
